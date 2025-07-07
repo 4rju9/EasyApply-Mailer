@@ -20,8 +20,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Lightbulb
 import androidx.compose.material.icons.filled.Visibility
@@ -34,6 +36,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -82,135 +85,138 @@ fun SetupScreen (
     val showHelpDialog = remember { mutableStateOf(false) }
     var passwordVisible by remember { mutableStateOf(false) }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
-            .padding(16.dp),
-        verticalArrangement = Arrangement.SpaceAround
-    ) {
+    Scaffold (
+        topBar = {
+            Column {
+                Spacer(modifier = Modifier.height(20.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "Setup Profile",
+                        color = MaterialTheme.colorScheme.onSurface,
+                        style = MaterialTheme.typography.headlineLarge
+                    )
 
-        Column {
-
-            Spacer(modifier = Modifier.height(30.dp))
-
+                    IconButton (
+                        onClick = { showHelpDialog.value = true }
+                    ) {
+                        Icon(Icons.Default.Lightbulb, contentDescription = "Password Help", tint = MaterialTheme.colorScheme.onSurface)
+                    }
+                }
+            }
+        },
+        bottomBar = {
             Row(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth().padding(start = 16.dp, end = 16.dp, bottom = 16.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(
-                    text = "Setup Profile",
-                    color = MaterialTheme.colorScheme.onSurface,
-                    style = MaterialTheme.typography.headlineLarge
-                )
-
-                IconButton (
-                    onClick = { showHelpDialog.value = true }
-                ) {
-                    Icon(Icons.Default.Lightbulb, contentDescription = "Password Help", tint = MaterialTheme.colorScheme.onSurface)
-                }
-            }
-
-            Spacer(modifier = Modifier.height(20.dp))
-
-            OutlinedTextField(
-                value = viewModel.name,
-                onValueChange = viewModel::onNameChanged,
-                label = { Text("Name") },
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(20.dp),
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = MaterialTheme.colorScheme.primary,
-                    unfocusedBorderColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                    cursorColor = MaterialTheme.colorScheme.primary,
-                    focusedTextColor = MaterialTheme.colorScheme.onSurface,
-                    unfocusedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                    focusedLabelColor = MaterialTheme.colorScheme.primary,
-                    unfocusedLabelColor = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            OutlinedTextField(
-                value = viewModel.email,
-                onValueChange = viewModel::onEmailChanged,
-                label = { Text("Email") },
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(20.dp),
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = MaterialTheme.colorScheme.primary,
-                    unfocusedBorderColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                    cursorColor = MaterialTheme.colorScheme.primary,
-                    focusedTextColor = MaterialTheme.colorScheme.onSurface,
-                    unfocusedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                    focusedLabelColor = MaterialTheme.colorScheme.primary,
-                    unfocusedLabelColor = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            OutlinedTextField(
-                value = viewModel.password,
-                onValueChange = viewModel::onPasswordChanged,
-                label = { Text("Password") },
-                visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-                trailingIcon = {
-                    val icon = if (passwordVisible) Icons.Default.VisibilityOff else Icons.Default.Visibility
-                    IconButton(onClick = { passwordVisible = !passwordVisible }) {
-                        Icon(imageVector = icon, contentDescription = if (passwordVisible) "Hide password" else "Show password")
-                    }
-                },
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(20.dp),
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = MaterialTheme.colorScheme.primary,
-                    unfocusedBorderColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                    cursorColor = MaterialTheme.colorScheme.primary,
-                    focusedTextColor = MaterialTheme.colorScheme.onSurface,
-                    unfocusedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                    focusedLabelColor = MaterialTheme.colorScheme.primary,
-                    unfocusedLabelColor = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Row (
-                horizontalArrangement = Arrangement.SpaceEvenly,
-                modifier = Modifier.fillMaxWidth()
-            ) {
                 Button(
                     onClick = {
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                            pdfPickerLauncher.launch(arrayOf("application/pdf"))
-                        } else {
-                            permissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
+                        viewModel.saveUser(context) { success ->
+                            if (success) onSetupDone()
                         }
                     },
                     colors = ButtonDefaults.buttonColors(
                         containerColor = MaterialTheme.colorScheme.tertiaryContainer,
                         contentColor = MaterialTheme.colorScheme.onTertiaryContainer
-                    )
+                    ),
+                    modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text("Pick Resume PDF")
+                    Text("Save Profile")
                 }
+            }
+        }
+    ) { innerPadding ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background)
+                .padding(innerPadding)
+                .padding(horizontal = 16.dp)
+                .verticalScroll(rememberScrollState()),
+            verticalArrangement = Arrangement.SpaceAround
+        ) {
 
-                if (viewModel.selectedPdfFileName.isNotBlank()) {
+            Column {
+
+                OutlinedTextField(
+                    value = viewModel.name,
+                    onValueChange = viewModel::onNameChanged,
+                    label = { Text("Name") },
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(20.dp),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = MaterialTheme.colorScheme.primary,
+                        unfocusedBorderColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                        cursorColor = MaterialTheme.colorScheme.primary,
+                        focusedTextColor = MaterialTheme.colorScheme.onSurface,
+                        unfocusedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                        focusedLabelColor = MaterialTheme.colorScheme.primary,
+                        unfocusedLabelColor = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                OutlinedTextField(
+                    value = viewModel.email,
+                    onValueChange = viewModel::onEmailChanged,
+                    label = { Text("Email") },
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(20.dp),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = MaterialTheme.colorScheme.primary,
+                        unfocusedBorderColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                        cursorColor = MaterialTheme.colorScheme.primary,
+                        focusedTextColor = MaterialTheme.colorScheme.onSurface,
+                        unfocusedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                        focusedLabelColor = MaterialTheme.colorScheme.primary,
+                        unfocusedLabelColor = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                OutlinedTextField(
+                    value = viewModel.password,
+                    onValueChange = viewModel::onPasswordChanged,
+                    label = { Text("Password") },
+                    visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                    trailingIcon = {
+                        val icon = if (passwordVisible) Icons.Default.VisibilityOff else Icons.Default.Visibility
+                        IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                            Icon(imageVector = icon, contentDescription = if (passwordVisible) "Hide password" else "Show password")
+                        }
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(20.dp),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = MaterialTheme.colorScheme.primary,
+                        unfocusedBorderColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                        cursorColor = MaterialTheme.colorScheme.primary,
+                        focusedTextColor = MaterialTheme.colorScheme.onSurface,
+                        unfocusedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                        focusedLabelColor = MaterialTheme.colorScheme.primary,
+                        unfocusedLabelColor = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Row (
+                    horizontalArrangement = Arrangement.SpaceEvenly,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
                     Button(
                         onClick = {
-                            viewModel.selectedPdfUri.let {
-                                try {
-                                    val intent = Intent(Intent.ACTION_VIEW).apply {
-                                        setDataAndType(it, "application/pdf")
-                                        addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                                    }
-                                    context.startActivity(intent)
-                                } catch (e: ActivityNotFoundException) {
-                                    Toast.makeText(context, "No app found to view PDF", Toast.LENGTH_SHORT).show()
-                                }
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                                pdfPickerLauncher.launch(arrayOf("application/pdf"))
+                            } else {
+                                permissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
                             }
                         },
                         colors = ButtonDefaults.buttonColors(
@@ -218,120 +224,129 @@ fun SetupScreen (
                             contentColor = MaterialTheme.colorScheme.onTertiaryContainer
                         )
                     ) {
-                        Text("Open Selected PDF")
+                        Text("Pick Resume PDF")
                     }
-                }
 
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            if (viewModel.selectedPdfFileName.isNotBlank()) {
-                Text("Selected PDF: ${viewModel.selectedPdfFileName}", maxLines = 1, color = MaterialTheme.colorScheme.primary)
-            }
-
-            if (pdfPreviewBitmap != null) {
-                Spacer(modifier = Modifier.height(16.dp))
-                AndroidView(
-                    factory = { context ->
-                        ImageView(context).apply {
-                            setImageBitmap(pdfPreviewBitmap)
-                            scaleType = ImageView.ScaleType.FIT_CENTER
-                        }
-                    },
-                    update = { imageView ->
-                        imageView.setImageBitmap(pdfPreviewBitmap)
-                    },
-                    modifier = Modifier
-                        .wrapContentWidth()
-                        .wrapContentHeight()
-                        .background(Color.White)
-                        .align(Alignment.CenterHorizontally)
-                )
-            }
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-        }
-
-        Button(
-            onClick = {
-                viewModel.saveUser(context) { success ->
-                    if (success) onSetupDone()
-                }
-            },
-            colors = ButtonDefaults.buttonColors(
-                containerColor = MaterialTheme.colorScheme.tertiaryContainer,
-                contentColor = MaterialTheme.colorScheme.onTertiaryContainer
-            ),
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text("Save Profile")
-        }
-
-    }
-
-    if (showHelpDialog.value) {
-
-        AlertDialog(
-            onDismissRequest = { showHelpDialog.value = false },
-            confirmButton = {
-                Button(onClick = { showHelpDialog.value = false }) {
-                    Text("Got it")
-                }
-            },
-            dismissButton = {
-                Button(
-                    onClick = {
-                        try {
-                            val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://myaccount.google.com/apppasswords"))
-                            context.startActivity(intent)
-                        } catch (e: ActivityNotFoundException) {
-                            Toast.makeText(context, "No browser found to open the link.", Toast.LENGTH_SHORT).show()
-                        }
-                    }
-                ) {
-                    Text("Open app passwords")
-                }
-            },
-            title = { Text("Guide to\nGet the password") },
-            text = {
-                val annotatedText = buildAnnotatedString {
-                    append("Don't use your Gmail password. Follow the steps:\n")
-                    append("Step 1: Go to ")
-
-                    pushStringAnnotation(tag = "URL", annotation = "https://myaccount.google.com/")
-                    withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.primary)) {
-                        append("myaccount.google.com")
-                    }
-                    pop()
-
-                    append("\nStep 2: Select Security tab\n")
-                    append("Step 3: Turn on your 2FA verification\n")
-                    append("Step 4: On search bar type 'App Passwords'\n")
-                    append("Step 5: Choose a name\n")
-                    append("Step 6: You'll see a password window, copy it from there and paste it here")
-                }
-                ClickableText(
-                    text = annotatedText,
-                    style = MaterialTheme.typography.bodyMedium.copy(color = MaterialTheme.colorScheme.onSurface),
-                    onClick = { offset ->
-                        annotatedText.getStringAnnotations(tag = "URL", start = offset, end = offset)
-                            .firstOrNull()?.let { annotation ->
-                                try {
-                                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(annotation.item))
-                                    context.startActivity(intent)
-                                } catch (e: Exception) {
-                                    Toast.makeText(context, "Unable to open the link", Toast.LENGTH_SHORT).show()
+                    if (viewModel.selectedPdfFileName.isNotBlank()) {
+                        Button(
+                            onClick = {
+                                viewModel.selectedPdfUri.let {
+                                    try {
+                                        val intent = Intent(Intent.ACTION_VIEW).apply {
+                                            setDataAndType(it, "application/pdf")
+                                            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                                        }
+                                        context.startActivity(intent)
+                                    } catch (e: ActivityNotFoundException) {
+                                        Toast.makeText(context, "No app found to view PDF", Toast.LENGTH_SHORT).show()
+                                    }
                                 }
-                            }
+                            },
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = MaterialTheme.colorScheme.tertiaryContainer,
+                                contentColor = MaterialTheme.colorScheme.onTertiaryContainer
+                            )
+                        ) {
+                            Text("Open Selected PDF")
+                        }
                     }
-                )
-            },
-            containerColor = MaterialTheme.colorScheme.tertiaryContainer,
-            titleContentColor = MaterialTheme.colorScheme.onTertiaryContainer,
-            textContentColor = MaterialTheme.colorScheme.onTertiaryContainer
-        )
+
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                if (viewModel.selectedPdfFileName.isNotBlank()) {
+                    Text("Selected PDF: ${viewModel.selectedPdfFileName}", maxLines = 1, color = MaterialTheme.colorScheme.primary)
+                }
+
+                if (pdfPreviewBitmap != null) {
+                    Spacer(modifier = Modifier.height(16.dp))
+                    AndroidView(
+                        factory = { context ->
+                            ImageView(context).apply {
+                                setImageBitmap(pdfPreviewBitmap)
+                                scaleType = ImageView.ScaleType.FIT_CENTER
+                            }
+                        },
+                        update = { imageView ->
+                            imageView.setImageBitmap(pdfPreviewBitmap)
+                        },
+                        modifier = Modifier
+                            .wrapContentWidth()
+                            .wrapContentHeight()
+                            .background(Color.White)
+                            .align(Alignment.CenterHorizontally)
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+            }
+
+        }
+
+        if (showHelpDialog.value) {
+
+            AlertDialog(
+                onDismissRequest = { showHelpDialog.value = false },
+                confirmButton = {
+                    Button(onClick = { showHelpDialog.value = false }) {
+                        Text("Got it")
+                    }
+                },
+                dismissButton = {
+                    Button(
+                        onClick = {
+                            try {
+                                val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://myaccount.google.com/apppasswords"))
+                                context.startActivity(intent)
+                            } catch (e: ActivityNotFoundException) {
+                                Toast.makeText(context, "No browser found to open the link.", Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                    ) {
+                        Text("Open app passwords")
+                    }
+                },
+                title = { Text("Guide to\nGet the password") },
+                text = {
+                    val annotatedText = buildAnnotatedString {
+                        append("Don't use your Gmail password. Follow the steps:\n")
+                        append("Step 1: Go to ")
+
+                        pushStringAnnotation(tag = "URL", annotation = "https://myaccount.google.com/")
+                        withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.primary)) {
+                            append("myaccount.google.com")
+                        }
+                        pop()
+
+                        append("\nStep 2: Select Security tab\n")
+                        append("Step 3: Turn on your 2FA verification\n")
+                        append("Step 4: On search bar type 'App Passwords'\n")
+                        append("Step 5: Choose a name\n")
+                        append("Step 6: You'll see a password window, copy it from there and paste it here")
+                    }
+                    ClickableText(
+                        text = annotatedText,
+                        style = MaterialTheme.typography.bodyMedium.copy(color = MaterialTheme.colorScheme.onSurface),
+                        onClick = { offset ->
+                            annotatedText.getStringAnnotations(tag = "URL", start = offset, end = offset)
+                                .firstOrNull()?.let { annotation ->
+                                    try {
+                                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(annotation.item))
+                                        context.startActivity(intent)
+                                    } catch (e: Exception) {
+                                        Toast.makeText(context, "Unable to open the link", Toast.LENGTH_SHORT).show()
+                                    }
+                                }
+                        }
+                    )
+                },
+                containerColor = MaterialTheme.colorScheme.tertiaryContainer,
+                titleContentColor = MaterialTheme.colorScheme.onTertiaryContainer,
+                textContentColor = MaterialTheme.colorScheme.onTertiaryContainer
+            )
+        }
     }
 
 }

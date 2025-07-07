@@ -7,10 +7,13 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -212,7 +215,7 @@ fun EmailCard(
                                 }
                             }
                         },
-                        label = { Text("Replacements (comma-separated)") },
+                        label = { Text("Replacements (comma-separated)", style = MaterialTheme.typography.bodyMedium) },
                         trailingIcon = {
                             if (replacementInput.isNotBlank()) {
                                 IconButton(onClick = {
@@ -277,7 +280,7 @@ fun EmailCard(
                             recipientInput = ""
                         }
                     },
-                    label = { Text("Recipients (comma-separated)") },
+                    label = { Text("Recipients (comma-separated)", style = MaterialTheme.typography.bodyMedium) },
                     trailingIcon = {
                         if (recipientInput.isNotBlank()) {
                             IconButton(onClick = {
@@ -330,7 +333,7 @@ fun EmailCard(
                 Spacer(modifier = Modifier.height(12.dp))
 
                 Row(
-                    horizontalArrangement = Arrangement.SpaceAround,
+                    horizontalArrangement = Arrangement.SpaceEvenly,
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Button(
@@ -339,12 +342,10 @@ fun EmailCard(
                             containerColor = MaterialTheme.colorScheme.primary,
                             contentColor = MaterialTheme.colorScheme.onPrimary
                         ),
-                        modifier = Modifier.weight(0.2f)
+                        modifier = Modifier.wrapContentWidth()
                     ) {
                         Text("Edit")
                     }
-
-                    Spacer(modifier = Modifier.weight(0.05f))
 
                     Button(
                         onClick = onDeleteClick,
@@ -352,12 +353,10 @@ fun EmailCard(
                             containerColor = MaterialTheme.colorScheme.primary,
                             contentColor = MaterialTheme.colorScheme.onPrimary
                         ),
-                        modifier = Modifier.weight(0.2f)
+                        modifier = Modifier.wrapContentWidth()
                     ) {
                         Text("Delete")
                     }
-
-                    Spacer(modifier = Modifier.weight(0.05f))
 
                     Button(
                         onClick = {
@@ -379,7 +378,7 @@ fun EmailCard(
                             containerColor = MaterialTheme.colorScheme.primary,
                             contentColor = MaterialTheme.colorScheme.onPrimary
                         ),
-                        modifier = Modifier.weight(0.25f)
+                        modifier = Modifier.wrapContentWidth()
                     ) {
                         if (isSending) {
                             CircularProgressIndicator(
