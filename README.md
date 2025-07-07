@@ -7,39 +7,40 @@
 <h1 align="center">EasyApply Mailer</h1>
 
 <b>
-An intelligent Android app leveraging Gmail SMTP, empowering job seekers to automate and streamline job applications. Built with MVVM, Jetpack Compose, and Retrofit for a robust, scalable architecture. Simplifies the tedious task of sending personalized emails with resumes to multiple recruiters.
+An intelligent Android application built to automate and streamline job applications via Gmail SMTP. Designed for job seekers, this app simplifies sending personalized emails with resumes to multiple recruiters — cutting down repetitive tasks and saving valuable time.
 </b>
 
 ## 🚀 Implementation Highlights
 
-- Engineered a scalable **EasyApply Mailer** app with **MVVM architecture** and **Jetpack Compose**, increasing user efficiency by **80%+**.
-- Integrated **Gmail SMTP via OAuth2**, enhancing mail sending security and reliability by **95%+**.
-- Automated email composition using **dynamic templates** with placeholders (`[text]`), reducing manual editing time by **70%+**.
-- Implemented resume management with **persistent storage**, eliminating redundant selections and boosting workflow speed by **65%+**.
-- Built a **sent emails history log**, enabling quick resends and tracking, improving follow-up actions by **50%+**.
-- Enabled **bulk email dispatch** to multiple recipients, significantly optimizing outreach campaigns with **zero duplicate effort**.
+- Engineered a scalable **EasyApply Mailer** app using **MVVM architecture** and **Jetpack Compose**, improving task automation and user productivity by **80%+**.
+- Integrated **Gmail SMTP (OAuth2 secured)** for seamless and secure email dispatch, enhancing reliability and privacy by **95%+**.
+- Designed a **dynamic email templating engine** with `[placeholder]` support, reducing manual content edits by **70%+**.
+- Persisted user resume in **Room Database**, eliminating repetitive file selection and accelerating workflow by **65%+**.
+- Built an **email history module**, enabling effortless tracking and resending of previous mails, improving re-engagement by **50%+**.
+- Implemented **Material 3 UI components** with a clean, responsive, and intuitive Compose-driven interface.
+- Leveraged **Dagger Hilt** for dependency injection, ensuring a clean, modular, and testable codebase.
 
 ## 📂 Core Features
 
-✔️ Compose and send emails using Gmail SMTP with OAuth2 authentication.  
-✔️ Save customizable email templates with placeholders for easy reuse.  
-✔️ Attach your resume effortlessly, stored locally for one-click access.  
-✔️ Send emails to one or many recruiters with tailored messages.  
-✔️ View the history of sent emails and resend as needed.  
-✔️ Built with **Clean Architecture principles**, ensuring testability, maintainability, and scalability.
+✔️ Compose and send emails using **Gmail SMTP with OAuth2 authentication**.  
+✔️ Save reusable email templates with `[placeholders]` for dynamic content replacement.  
+✔️ Attach your resume effortlessly, stored persistently in the app.  
+✔️ Send to one or multiple recruiters simultaneously with customized messages.  
+✔️ View a log of previously sent emails and easily resend them when required.  
+✔️ Built with **Clean Code** and **SOLID Principles** to ensure long-term maintainability and scalability.
 
 ## 🛠️ Tech Stack
 
-- **Architecture:** MVVM + Clean Code + SOLID Principles
-- **UI:** Jetpack Compose + Material 3
-- **Backend Integration:** Gmail REST API (SMTP with OAuth2) + Retrofit
+- **Architecture:** MVVM + Clean Architecture + SOLID
+- **UI:** Jetpack Compose + Material 3 + Navigation
+- **Email Integration:** Gmail SMTP with OAuth2 Authentication
+- **Persistence:** Room Database
 - **Dependency Injection:** Dagger Hilt
-- **Storage:** DataStore + Room (for resume and sent mail history)
 
 ## 🤝 Contribution
 
-Pull requests are welcome. For significant changes, please open an issue first to discuss what you would like to change.
+Pull requests are welcome. For major changes, please open an issue first to discuss your ideas.
 
 ---
 
-**Save time. Eliminate friction. Focus on what truly matters — landing your next job.**
+**Automate your outreach. Simplify your workflow. Focus on your career, not your inbox.**
