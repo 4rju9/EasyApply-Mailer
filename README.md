@@ -1,5 +1,5 @@
 <p align="center">
-   <a href="https://github.com/4rju9/EasyApply-Mailer"><img src="https://github.com/user-attachments/assets/21b2eaa7-bf37-4e33-917b-0c51a8f1bfd7" alt="EasyApply Mailer Logo"></a>
+   <a href="https://github.com/4rju9/EasyApply-Mailer"><img src="https://github.com/user-attachments/assets/cdf984c3-470b-4bde-8bc1-2d9be42d0eec" alt="EasyApply Mailer Logo"></a>
    <br>
    <br>
 </p>
