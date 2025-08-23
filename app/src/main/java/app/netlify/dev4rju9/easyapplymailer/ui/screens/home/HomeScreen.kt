@@ -7,12 +7,10 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
@@ -56,7 +54,9 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import app.netlify.dev4rju9.easyapplymailer.model.room.EmailEntity
 import app.netlify.dev4rju9.easyapplymailer.utils.Utility.extractPlaceholdersCount
+import app.netlify.dev4rju9.easyapplymailer.utils.Utility.getGreeting
 import app.netlify.dev4rju9.easyapplymailer.utils.Utility.replacePlaceholders
+import app.netlify.dev4rju9.easyapplymailer.utils.Utility.replacePlaceholdersWithHighlights
 import java.util.Calendar
 
 @Composable
@@ -394,50 +394,4 @@ fun EmailCard(
             }
         }
     }
-}
-
-fun getGreeting(): String {
-    val calendar = Calendar.getInstance()
-    val hour = calendar.get(Calendar.HOUR_OF_DAY)
-
-    return when (hour) {
-        in 5..11 -> "Good Morning"
-        in 12..16 -> "Good Afternoon"
-        in 17..21 -> "Good Evening"
-        else -> "Fix your sleep cycle"
-    }
-}
-
-fun replacePlaceholdersWithHighlights(
-    template: String,
-    replacements: List<String>,
-    placeholderPattern: Regex = Regex("\\[.*?]"),
-    highlightColor: Color
-): AnnotatedString {
-    val result = buildAnnotatedString {
-        var lastIndex = 0
-        var replacementIndex = 0
-
-        for (match in placeholderPattern.findAll(template)) {
-            val start = match.range.first
-            val end = match.range.last + 1
-
-            append(template.substring(lastIndex, start))
-
-            if (replacementIndex < replacements.size) {
-                withStyle(style = SpanStyle(color = highlightColor)) {
-                    append(replacements[replacementIndex])
-                }
-                replacementIndex++
-            }
-
-            lastIndex = end
-        }
-
-        if (lastIndex < template.length) {
-            append(template.substring(lastIndex))
-        }
-    }
-
-    return result
 }

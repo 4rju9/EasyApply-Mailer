@@ -82,6 +82,12 @@ dependencies {
     ksp(libs.hilt.android.compiler)
     implementation(libs.androidx.hilt.navigation.compose)
 
+    // Hilt + WorkManager integration
+    ksp(libs.hilt.compiler.androidx)
+    implementation(libs.hilt.work)
+
+    implementation(libs.work.runtime.ktx)
+
     // Room Database
     implementation(libs.room.runtime)
     implementation(libs.room.ktx)

@@ -37,31 +37,35 @@ object GmailSender {
             }
         })
 
-        try {
-            val message = MimeMessage(session)
-            message.setFrom(InternetAddress(senderEmail))
-            message.setRecipients(Message.RecipientType.TO, recipients.joinToString(",") { it })
-            message.subject = subject
+        recipients.forEach { reciever ->
 
-            val multipart = MimeMultipart()
+            try {
+                val message = MimeMessage(session)
+                message.setFrom(InternetAddress(senderEmail))
+                message.setRecipients(Message.RecipientType.TO, reciever)
+                message.subject = subject
 
-            val textBodyPart = MimeBodyPart()
-            textBodyPart.setText(body)
+                val multipart = MimeMultipart()
 
-            val attachmentBodyPart = MimeBodyPart()
-            attachmentBodyPart.dataHandler = DataHandler(FileDataSource(resumePath))
-            attachmentBodyPart.fileName = resumeName
+                val textBodyPart = MimeBodyPart()
+                textBodyPart.setText(body)
 
-            multipart.addBodyPart(textBodyPart)
-            multipart.addBodyPart(attachmentBodyPart)
+                val attachmentBodyPart = MimeBodyPart()
+                attachmentBodyPart.dataHandler = DataHandler(FileDataSource(resumePath))
+                attachmentBodyPart.fileName = resumeName
 
-            message.setContent(multipart)
+                multipart.addBodyPart(textBodyPart)
+                multipart.addBodyPart(attachmentBodyPart)
 
-            Transport.send(message)
+                message.setContent(multipart)
 
-        } catch (e: MessagingException) {
-            e.printStackTrace()
-            throw RuntimeException("Failed to send email")
+                Transport.send(message)
+
+            } catch (e: MessagingException) {
+                e.printStackTrace()
+                throw RuntimeException("Failed to send email")
+            }
+
         }
     }
 

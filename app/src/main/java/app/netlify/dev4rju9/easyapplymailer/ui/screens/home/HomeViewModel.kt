@@ -5,10 +5,17 @@ import android.net.Uri
 import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.work.BackoffPolicy
+import androidx.work.Constraints
+import androidx.work.NetworkType
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkInfo
+import androidx.work.WorkManager
+import androidx.work.workDataOf
 import app.netlify.dev4rju9.easyapplymailer.model.repository.Repository
 import app.netlify.dev4rju9.easyapplymailer.model.room.EmailEntity
 import app.netlify.dev4rju9.easyapplymailer.model.room.UserEntity
-import app.netlify.dev4rju9.easyapplymailer.utils.GmailSender
+import app.netlify.dev4rju9.easyapplymailer.utils.SendEmailWorker
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -20,6 +27,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 @HiltViewModel
@@ -55,46 +63,59 @@ class HomeViewModel @Inject constructor(
     }
 
     fun sendEmail(email: EmailEntity, recipients: List<String>, context: Context, onSuccess: () -> Unit) {
-        viewModelScope.launch(Dispatchers.IO) {
-            _isSending.value = true
-            try {
-                if (user != null) {
-                    val file = getFileFromUri(context, user.resumeUri)
-                    if (file == null) {
-                        withContext(Dispatchers.Main) {
-                            Toast.makeText(context, "Resume file not found", Toast.LENGTH_SHORT).show()
-                        }
-                        return@launch
-                    }
+        if (user == null) {
+            Toast.makeText(context, "User profile not found", Toast.LENGTH_SHORT).show()
+            return
+        }
 
-                    GmailSender.sendMail(
-                        senderEmail = user.email,
-                        senderPassword = user.password,
-                        recipients = recipients,
-                        subject = email.subject,
-                        body = email.body,
-                        resumePath = file.absolutePath,
-                        resumeName = user.resumeFileName
-                    )
+        val file = getFileFromUri(context, user.resumeUri)
+        if (file == null) {
+            Toast.makeText(context, "Resume file not found", Toast.LENGTH_SHORT).show()
+            return
+        }
 
-                    withContext(Dispatchers.Main) {
+        _isSending.value = true
+
+        val workData = workDataOf(
+            "senderEmail" to user.email,
+            "senderPassword" to user.password,
+            "recipients" to recipients.toTypedArray(),
+            "subject" to email.subject,
+            "body" to email.body,
+            "resumePath" to file.absolutePath,
+            "resumeName" to user.resumeFileName
+        )
+
+        val workRequest = OneTimeWorkRequestBuilder<SendEmailWorker>()
+            .setConstraints(
+                Constraints
+                    .Builder()
+                    .setRequiredNetworkType(NetworkType.CONNECTED)
+                    .build()
+            )
+            .setBackoffCriteria(
+                BackoffPolicy.EXPONENTIAL,
+                10,
+                TimeUnit.SECONDS
+            )
+            .setInputData(workData)
+            .build()
+
+        WorkManager.getInstance(context).enqueue(workRequest)
+
+        WorkManager.getInstance(context).getWorkInfoByIdLiveData(workRequest.id)
+            .observeForever { workInfo ->
+                if (workInfo != null && workInfo.state.isFinished) {
+                    _isSending.value = false
+                    if (workInfo.state == WorkInfo.State.SUCCEEDED) {
                         Toast.makeText(context, "Email sent successfully", Toast.LENGTH_SHORT).show()
                         onSuccess()
-                    }
-                } else {
-                    withContext(Dispatchers.Main) {
-                        Toast.makeText(context, "User profile not found", Toast.LENGTH_SHORT).show()
+                    } else {
+                        val errorMsg = workInfo.outputData.getString("error") ?: "Unknown error"
+                        Toast.makeText(context, "Failed to send email: $errorMsg", Toast.LENGTH_LONG).show()
                     }
                 }
-            } catch (e: Exception) {
-                e.printStackTrace()
-                withContext(Dispatchers.Main) {
-                    Toast.makeText(context, "Failed to send email: ${e.message}", Toast.LENGTH_LONG).show()
-                }
-            } finally {
-                _isSending.value = false
             }
-        }
     }
 
     private fun getFileFromUri(context: Context, uriString: String): File? {

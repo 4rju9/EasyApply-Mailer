@@ -1,6 +1,7 @@
 package app.netlify.dev4rju9.easyapplymailer.ui.screens.setup
 
 import android.content.Context
+import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.pdf.PdfRenderer
 import android.net.Uri
@@ -98,9 +99,17 @@ class SetupViewModel @Inject constructor(
         selectedPdfUri?.also { generatePdfPreview(context, it) }
     }
 
+    fun persistUriPermission(context: Context, uri: Uri) {
+        context.contentResolver.takePersistableUriPermission(
+            uri,
+            Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+        )
+    }
+
     fun onPdfSelected(uri: Uri, context: Context) {
         selectedPdfUri = uri
         selectedPdfFileName = extractFileName(uri, context)
+        persistUriPermission(context, uri)
         generatePdfPreview(context, uri)
     }
 
