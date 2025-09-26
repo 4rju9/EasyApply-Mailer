@@ -1,11 +1,15 @@
 package app.netlify.dev4rju9.easyapplymailer
 
 import android.content.Context
+import android.os.Build
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -21,6 +25,7 @@ import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -30,6 +35,7 @@ class MainActivity : ComponentActivity() {
                 val sharedPreferences = getSharedPreferences("app", Context.MODE_PRIVATE)
                 val startDestination = if (sharedPreferences.getBoolean("setup", true)) Screen.Setup.route
                 else Screen.Home.route
+
                 MyAppNavHost(
                     startDestination = startDestination,
                     onSetupDone = {

@@ -1,5 +1,6 @@
 package app.netlify.dev4rju9.easyapplymailer.ui.screens.setup
 
+import android.content.ContentUris
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap

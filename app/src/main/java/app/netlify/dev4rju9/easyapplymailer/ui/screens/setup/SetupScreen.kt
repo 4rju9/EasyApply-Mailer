@@ -73,9 +73,22 @@ fun SetupScreen (
     }
 
     val permissionLauncher = rememberLauncherForActivityResult(
-        ActivityResultContracts.RequestPermission()
-    ) { isGranted ->
-        if (isGranted) pdfPickerLauncher.launch(arrayOf("application/pdf"))
+        ActivityResultContracts.RequestMultiplePermissions()
+    ) { permissions ->
+        permissions.entries.forEach {
+            val granted = it.value
+            if (granted) {
+                if (it.key == Manifest.permission.READ_EXTERNAL_STORAGE) {
+                    pdfPickerLauncher.launch(arrayOf("application/pdf"))
+                }
+            }
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            permissionLauncher.launch(arrayOf(Manifest.permission.POST_NOTIFICATIONS))
+        }
     }
 
     LaunchedEffect(viewModel.selectedPdfUri) {
@@ -217,7 +230,7 @@ fun SetupScreen (
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                                 pdfPickerLauncher.launch(arrayOf("application/pdf"))
                             } else {
-                                permissionLauncher.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
+                                permissionLauncher.launch(arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE))
                             }
                         },
                         colors = ButtonDefaults.buttonColors(

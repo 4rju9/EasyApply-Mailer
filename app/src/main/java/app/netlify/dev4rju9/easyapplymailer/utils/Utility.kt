@@ -1,10 +1,18 @@
 package app.netlify.dev4rju9.easyapplymailer.utils
 
+import android.app.Notification
+import android.app.NotificationManager
+import android.app.PendingIntent
+import android.content.Context
+import android.content.Intent
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
+import androidx.core.app.NotificationCompat
+import app.netlify.dev4rju9.easyapplymailer.MainActivity
+import app.netlify.dev4rju9.easyapplymailer.R
 import java.util.Calendar
 
 object Utility {
@@ -69,6 +77,37 @@ object Utility {
         }
 
         return result
+    }
+
+    fun getNotificationManager (applicationContext: Context) = applicationContext
+        .getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+
+    fun createNotification(
+        applicationContext: Context,
+        title: String,
+        body: String
+    ): Notification {
+
+        val intent = Intent(applicationContext, MainActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        }
+
+        val pendingIntent = PendingIntent.getActivity(
+            applicationContext,
+            0,
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
+        return NotificationCompat.Builder(applicationContext, "easy_apply_mailer")
+            .setContentTitle(title)
+            .setContentText(body)
+            .setSmallIcon(R.drawable.ic_notification)
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setAutoCancel(true)
+            .setContentIntent(pendingIntent)
+            .setStyle(NotificationCompat.BigTextStyle().bigText(body))
+            .build()
     }
 
 }

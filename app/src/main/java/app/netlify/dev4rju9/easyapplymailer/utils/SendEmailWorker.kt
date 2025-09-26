@@ -24,18 +24,21 @@ class SendEmailWorker @AssistedInject constructor(
             val resumePath = inputData.getString("resumePath")
             val resumeName = inputData.getString("resumeName")
 
+            /* Code to check whether pdf file is valid & only force to have a valid pdf file.
             if (resumePath.isNullOrEmpty() || resumeName.isNullOrEmpty()) {
                 return Result.failure(workDataOf("error" to "Resume file not found"))
             }
+            */
 
             GmailSender.sendMail(
+                context = applicationContext,
                 senderEmail = senderEmail,
                 senderPassword = senderPassword,
                 recipients = recipients,
                 subject = subject,
                 body = body,
-                resumePath = resumePath,
-                resumeName = resumeName
+                resumePath = resumePath?: "",
+                resumeName = resumeName?: ""
             )
 
             Result.success()
